@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -12,77 +12,68 @@
 
 <body translate="no">
     <section id="main">
-        <div class="jumbotron vertical-center">
-            <div class="jumbotron real-jumbo">
-                <div class="container-fluid real-container">
+        <div class="jumbotron v-center" id="out-jumbo">
+            <div class="jumbotron real-jumbo" id="real-jumbo">
+                <div class="container-fluid" id="jumbo-container">
                     <div class="row">
-                        <div class="col-7">
-                            <div class="row">
-                                <div class="col-12">
-                                    <h1>Shape Of You</h1>
-                                </div>
+                        <div class="col-8">
+                            <div class="row tl1">
+                                <div class="col-12">Shape Of You</div>
                             </div>
-                            <div class="row">
-                                <div class="col-1 offset-1">
-                                    <h4><i class="fas fa-music"></i></h4>
-                                </div>
-                                <div class="col-10">
-                                    <h4>Ed Sheeran</h4>
-                                </div>
+                            <div class="row tl2 text-center">
+                                <div class="col-2 offset-1"><i class="fas fa-music"></i></div>
+                                <div class="col-9">Ed Sheeran</div>
                             </div>
-                            <div class="row">
-                                <div class="col-1 offset-1">
-                                    <h5><i class="fas fa-compact-disc"></i></h5>
-                                </div>
-                                <div class="col-10">
-                                    <h5>÷</h5>
-                                </div>
+                            <div class="row tl2 text-center">
+                                <div class="col-2 offset-1"><i class="fas fa-compact-disc"></i></div>
+                                <div class="col-9">÷</div>
                             </div>
-                            <div class="row">
-                                <div class="col-1 offset-1">
-                                    <h5><i class="fas fa-clock"></i></h5>
-                                </div>
-                                <div class="col-10">
-                                    <h5>3:54</h5>
-                                </div>
+                            <div class="row tl3 text-center">
+                                <div class="col-2 offset-1"><i class="fas fa-clock"></i></div>
+                                <div class="col-9">3:54</div>
                             </div>
-                            <hr>
-                            <div class="row">
+                            <hr class="boring-hr">
+                            <div class="row h4">
                                 <div class="col-4 text-center">
-                                    <a href="#">
-                                        <h1><i class="fab fa-spotify"></i></h1>Abrir en Spotify
+                                    <a class="simple-a" href="#">
+                                        <p class="ico1"><i class="fab fa-spotify"></i></p>
+                                        <p class="compact">Abrir en Spotify</p>
                                     </a>
                                 </div>
                                 <div class="col-4 text-center">
-                                    <a href="#">
-                                        <h1><i class="fas fa-forward"></i></h1>Siguiente sugerencia
+                                    <a class="simple-a" href="#">
+                                        <p class="ico1"><i class="fas fa-forward"></i></p>
+                                        <p class="compact">Siguiente sugerencia</p>
                                     </a>
                                 </div>
                                 <div class="col-4 text-center">
-                                    <a href="#">
-                                        <h1><i class="fas fa-thumbs-down"></i></h1>¡No me gusta!
+                                    <a class="simple-a" href="#">
+                                        <p class="ico1"><i class="fas fa-thumbs-down"></i></p>
+                                        <p class="compact">¡No me gusta!</p>
                                     </a>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-5 d-flex align-items-center justify-content-center hidden">
+                        <div class="col-4 d-flex align-items-center justify-content-center hidden">
                             <img src="http://themusicbox.net/wp-content/uploads/2017/01/Ed-Sheeran_Divide_Final_Artwork_Medium_Size-44527.jpg" class="img-responsive img-thumbnail">
                         </div>
                     </div>
-                    <hr>
-                    <div class="row text-center">
+                    <hr class="boring-hr">
+                    <div class="row text-center h3">
                         <div class="col-6">
-                            <a href="#">
-                                <h1><i class="fas fa-star"></i>
+                            <a class="simple-a" href="#">
+                                <p class="ico2"><i class="fas fa-star"></i>
                                     <i class="fas fa-star"></i>
                                     <i class="fas fa-star-half-alt"></i>
                                     <i class="far fa-star"></i>
-                                    <i class="far fa-star"></i></h1>Califica esta sugerencia
+                                    <i class="far fa-star"></i></p>
+                                <p class="compact">Califica esta sugerencia</p>
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="#">
-                                <h1 class="text-center"><i class="fas fa-heart-broken"></i></h1>No me gusta este artista
+                            <a class="simple-a" href="#">
+                                <p class="ico2"><i class="fas fa-heart-broken"></i></p>
+                                <p class="compact">No me gusta este artista</p>
                             </a>
                         </div>
                     </div>
@@ -90,6 +81,8 @@
             </div>
         </div>
     </section>
+
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.js'></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.js'></script>
+    <script src='../js/index.js'></script>
 </body></html>
