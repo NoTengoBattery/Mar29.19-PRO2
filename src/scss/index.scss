@@ -11,16 +11,21 @@
  * original.
  */
 
-$bg-scale: 1.50;
+$bg-scale: 1.25;
 $bg-blur-px: 24px;
 $text-color: black;
 $jumbo-opacity: 0.80;
 $jumbo-abs-min-w: 650px;
 $jumbo-abs-max-w: 1000px;
+$jumbo-scale: 1.00;
 $hr-margin: 12px;
 
-section#main {
-    background-image: url("http://themusicbox.net/wp-content/uploads/2017/01/Ed-Sheeran_Divide_Final_Artwork_Medium_Size-44527.jpg");
+/* Queremos que el body y la section tengan las mismas propiedades referentes
+ * al fondo. De esta forma cuando desaparezca la section, no habrá una
+ * transisión al blanco, sino una transisión suave entre fondos. */
+section#main,
+body {
+    background-image: url("");
     background-position: center;
     background-repeat: no-repeat;
     /* esto oculta el background del objeto real */
@@ -31,7 +36,8 @@ section#main {
     overflow: auto;
 }
 
-section#main::before {
+section#main::before,
+body::before {
     content: "";
     position: fixed;
     left: 0px;
@@ -59,8 +65,10 @@ div.real-jumbo {
     padding: 2rem 1rem;
     opacity: $jumbo-opacity;
 
-    min-width: $jumbo-abs-min-w !important;
-    max-width: $jumbo-abs-max-w !important;
+    min-width: calc(#{$jumbo-abs-min-w} / #{$jumbo-scale}) !important;
+    max-width: calc(#{$jumbo-abs-max-w} / #{$jumbo-scale}) !important;
+
+    transform: scale($jumbo-scale, $jumbo-scale);
 }
 
 div.v-center {
@@ -82,15 +90,21 @@ hr.boring-hr {
     margin-bottom: $hr-margin;
 }
 
+.overflowable {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 /* Tipos de letra */
 
-.ico1 {
+p.ico1 {
     font-size: 3.50rem;
     font-weight: 100;
     line-height: 1.00;
 }
 
-.ico2 {
+p.ico2 {
     font-size: 2.50rem;
     font-weight: 100;
     line-height: 1.00;
@@ -108,12 +122,12 @@ p.compact {
 
 .tl2 {
     font-size: 2.00rem;
-    font-weight: 425;
+    font-weight: 450;
     line-height: 1.15;
 }
 
 .tl3 {
     font-size: 1.75rem;
-    font-weight: 350;
+    font-weight: 400;
     line-height: 1.15;
 }

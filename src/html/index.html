@@ -11,40 +11,45 @@
 </head>
 
 <body translate="no">
+
     <section id="main">
         <div class="jumbotron v-center" id="out-jumbo">
-            <div class="jumbotron real-jumbo" id="real-jumbo">
+            <div class="jumbotron real-jumbo shadow" id="real-jumbo">
                 <div class="container-fluid" id="jumbo-container">
                     <div class="row">
                         <div class="col-8">
                             <div class="row tl1">
-                                <div class="col-12">Shape Of You</div>
+                                <div class="col-12">
+                                    <p class="overflowable" id="track-name">-</p>
+                                </div>
                             </div>
                             <div class="row tl2 text-center">
                                 <div class="col-2 offset-1"><i class="fas fa-music"></i></div>
-                                <div class="col-9">Ed Sheeran</div>
+                                <div class="col-9">
+                                    <p class="overflowable" id="track-artist">-</p>
+                                </div>
                             </div>
                             <div class="row tl2 text-center">
                                 <div class="col-2 offset-1"><i class="fas fa-compact-disc"></i></div>
-                                <div class="col-9">÷</div>
+                                <div class="col-9">
+                                    <p class="overflowable" id="track-album">-</p>
+                                </div>
                             </div>
                             <div class="row tl3 text-center">
                                 <div class="col-2 offset-1"><i class="fas fa-clock"></i></div>
-                                <div class="col-9">3:54</div>
+                                <div class="col-9">
+                                    <p class="overflowable" id="track-length">00:00</p>
+                                </div>
                             </div>
                             <hr class="boring-hr">
                             <div class="row h4">
-                                <div class="col-4 text-center">
-                                    <a class="simple-a" href="#">
-                                        <p class="ico1"><i class="fab fa-spotify"></i></p>
-                                        <p class="compact">Abrir en Spotify</p>
-                                    </a>
+                                <div class="col-4 text-center" id="p-open">
+                                    <p class="ico1"><i class="fab fa-spotify"></i></p>
+                                    <p class="compact">Abrir en Spotify</p>
                                 </div>
-                                <div class="col-4 text-center">
-                                    <a class="simple-a" href="#">
-                                        <p class="ico1"><i class="fas fa-forward"></i></p>
-                                        <p class="compact">Siguiente sugerencia</p>
-                                    </a>
+                                <div class="col-4 text-center" id="p-next">
+                                    <p class="ico1"><i class="fas fa-forward"></i></p>
+                                    <p class="compact">Siguiente sugerencia</p>
                                 </div>
                                 <div class="col-4 text-center">
                                     <a class="simple-a" href="#">
@@ -55,7 +60,7 @@
                             </div>
                         </div>
                         <div class="col-4 d-flex align-items-center justify-content-center hidden">
-                            <img src="http://themusicbox.net/wp-content/uploads/2017/01/Ed-Sheeran_Divide_Final_Artwork_Medium_Size-44527.jpg" class="img-responsive img-thumbnail">
+                            <img id="album-art" src="" class="img-responsive img-thumbnail shadow-sm">
                         </div>
                     </div>
                     <hr class="boring-hr">
