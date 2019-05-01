@@ -60,8 +60,10 @@ var randySongs = Array(
     "All That She Wants - Ace of Base",
     "Problem - Ariana Grande",
     "Homemade Dynamite - Lorde",
-    "Somebody Else - 1975");
-var currIdx = 0;
+    "Somebody Else - 1975",
+    "Gangsta's Paradise - Coolio",
+    "Sin Miedo a Nada - Alex Ubago");
+var currIdx = Math.floor(Math.random() * randySongs.length);
 
 function updateTrack() {
     var randySong = randySongs[currIdx];
@@ -89,23 +91,33 @@ function updateTrack() {
             var trackItem0Name = trackItem0.name;
             console.log(trackItem0);
 
-            $('#main').fadeOut(fadeOutDelayMs, function () {
-                $('#track-name').text(trackItem0Name);
-                $('#track-artist').text(trackItem0Artist0Name);
-                $('#track-album').text(trackItem0AlbumName);
-                $('#track-length').text(trackItem0Duration);
-                $('#album-art').attr("src", trackItem0AlbumImages0Url);
+            /* Precargar imagen */
+            var preImg = new Image();
+            preImg.src = trackItem0AlbumImages0Url;
+            /* Llamar a la animación cuando la imagen esté precargada. Esto
+             * evita los glitches en conexiones lentas o con mucha latencia
+             * (glitches donde la imagen se ve a medias o simplemente no
+             * está). Debería funcionar en todos los navegadores modernos.
+             */
+            preImg.onload = function () {
+                $('#main').fadeOut(fadeOutDelayMs, function () {
+                    $('#track-name').text(trackItem0Name);
+                    $('#track-artist').text(trackItem0Artist0Name);
+                    $('#track-album').text(trackItem0AlbumName);
+                    $('#track-length').text(trackItem0Duration);
+                    $('#album-art').attr("src", trackItem0AlbumImages0Url);
 
-                $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * 4, function () {
-                    $('body').css("background-image", trackItem0AlbumImages0Url_construct);
+                    $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * 4, function () {
+                        $('body').css("background-image", trackItem0AlbumImages0Url_construct);
+                    });
                 });
-            });
-            /* Limpiar el handler ya que si no se hace, siempre usa el primero
-             * que se le enlaza, es decir: no cambia de acción */
-            $("#p-open").unbind("click");
-            $('#p-open').click(function () {
-                window.open(trackItem0.external_urls.spotify, "_blank")
-            });
+                /* Limpiar el handler ya que si no se hace, siempre usa el primero
+                 * que se le enlaza, es decir: no cambia de acción */
+                $("#p-open").unbind("click");
+                $('#p-open').click(function () {
+                    window.open(trackItem0.external_urls.spotify, "_blank")
+                });
+            }
         }
     });
 }
