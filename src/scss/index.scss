@@ -1,17 +1,13 @@
 /*
  * Hoja de estilos principal. Se evita modificar directamente las clases, se
- * prefiere usar una nueva subclase anidada a la clase original. Todas las
- * referencias a las clases deben empezar con su respectivo tipo de DOM. Es
- * decir, CSS con nombre y apellido.
- *
- * Obviamente, a menos que se necesite heredar los estilos a hijos que no sean
- * necesariamente del mismo tipo DOM.
+ * prefiere usar una nueva subclase anidada a la clase original o utilizar
+ * los ID (idealmente).
  *
  * El archivo original está escrito en SCSS. libsass es bueno para compilar el
  * original.
  */
 
-$bg-scale: 1.25;
+$bg-scale: 1.50;
 $bg-blur-px: 24px;
 $text-color: black;
 $jumbo-opacity: 0.80;
@@ -55,11 +51,6 @@ body::before {
     transform: scale($bg-scale, $bg-scale);
 }
 
-a.simple-a {
-    text-decoration: none;
-    color: $text-color;
-}
-
 div.real-jumbo {
     margin: 0px;
     padding: 2rem 1rem;
@@ -90,6 +81,12 @@ hr.boring-hr {
     margin-bottom: $hr-margin;
 }
 
+a.simple-a {
+    text-decoration: none;
+    color: $text-color;
+}
+
+
 .overflowable {
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -98,19 +95,19 @@ hr.boring-hr {
 
 /* Tipos de letra */
 
-p.ico1 {
+.ico1 {
     font-size: 3.50rem;
     font-weight: 100;
     line-height: 1.00;
 }
 
-p.ico2 {
+.ico2 {
     font-size: 2.50rem;
     font-weight: 100;
     line-height: 1.00;
 }
 
-p.compact {
+.compact {
     line-height: 0.925;
 }
 
