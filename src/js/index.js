@@ -22,6 +22,7 @@
 /* Delays y tiempos */
 var fadeInDelayMs = 125;
 var fadeOutDelayMs = fadeInDelayMs;
+var longFadeFactor = 4;
 /* Tokens e identidades */
 var token = ''
 /* Arrays */
@@ -73,8 +74,8 @@ function msToMinSecs(duration) {
 /* onDocumentReady ----------------------------------------------------------------------------------------------------------- */
 function onDocumentReady() {
     /* Código runOnce */
-    querySpotify();
     centerContainer();
+    querySpotify();
 
     /* Configuración de handlers */
     $("#p-next").click(onNextClicked);
@@ -109,7 +110,7 @@ function onAlbumArtLoaded(spotifyObject) {
         $('#track-length').text(trackItem0Duration);
         $('#album-art').attr("src", trackItem0AlbumImages0Url);
 
-        $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * 4, function () {
+        $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * longFadeFactor, function () {
             $('body').css("background-image", trackItem0AlbumImages0Url_construct);
         });
     });
@@ -150,7 +151,10 @@ function centerContainer() {
     var elementHeight = $element.height();
     var viewportHeight = $window.height();
     var scrollIt = elementTop - ((viewportHeight - elementHeight) / 2);
-    $parent.scrollTop(scrollIt);
+    //$parent.scrollTop(scrollIt);
+    $parent.animate({
+        scrollTop: scrollIt
+    }, fadeInDelayMs * longFadeFactor);
 }
 
 function querySpotify() {
