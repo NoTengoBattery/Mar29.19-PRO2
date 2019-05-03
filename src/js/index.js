@@ -23,7 +23,7 @@
 var fadeInDelayMs = 125;
 var fadeOutDelayMs = fadeInDelayMs;
 /* Tokens e identidades */
-var token = 'BQCVltywVFlSjngd1hPDRKE0FxAW8hxp14CpCKlgiPAVDpp_DYsoiwEMM7qPIK59bkx2NBMbpi1Fv8tR52M_cZfkv9iLxMxTyBR7RA8lCWGscgLYL3ViRdO5Q0pcUEG5U2zUV80sdrQ10BbiJTiNHGnA_BLxJPc5KVRqd5w_Fp4JyWUtSIwtBcsdzkBoGGhH6vNA2NMQ91nLikBAv8zCLc1hVSCpy8EAS485H9uHzegvb9laJdxG7lxF8mrfKoSzIjOeIYpHaNTodEbl1NhostaD'
+var token = ''
 /* Arrays */
 var randySongs = Array(
     "Fast Lane - Rationale",
@@ -46,9 +46,9 @@ var randySongs = Array(
     "The Cave - Mumford and Sons");
 /* Índices de array */
 var currentRandyIndex = Math.floor(Math.random() * randySongs.length);
-/* Otros */
-const dbDriver = neo4j.v1.driver("bolt://localhost", neo4j.v1.auth.basic("neo4j", "db1"));
-const dbSession = driver.session();
+/* Base de datos */
+const dbDriver = neo4j.v1.driver("bolt://localhost", neo4j.v1.auth.basic("neo4j", "db1")); /* Conexión al driver */
+const dbSession = dbDriver.session(); /* Sesión de peticiones */
 
 /* Utilidades ---------------------------------------------------------------------------------------------------------------- */
 function msToMinSecs(duration) {
@@ -68,29 +68,12 @@ function msToMinSecs(duration) {
 }
 
 /* Conexión con Spotify ------------------------------------------------------------------------------------------------------ */
-function querySpotify() {
-    var randySong = randySongs[currentRandyIndex];
-    currentRandyIndex = (currentRandyIndex + 1) % randySongs.length;
-    $.ajax({
-        type: "GET",
-        url: "https://api.spotify.com/v1/search",
-        headers: {
-            Authorization: 'Bearer ' + token
-        },
-        data: {
-            q: randySong,
-            type: 'track',
-            limit: '1',
-            offset: '0'
-        },
-        success: onSpotifyGetSuccess
-    });
-}
-querySpotify();
+
 
 /* onDocumentReady ----------------------------------------------------------------------------------------------------------- */
 function onDocumentReady() {
     /* Código runOnce */
+    querySpotify();
     centerContainer();
 
     /* Configuración de handlers */
@@ -110,7 +93,7 @@ function onWindowResize() {
     centerContainer();
 }
 
-function onSpotifyGetSuccess(spotifyObject) {
+function onAlbumArtLoaded(spotifyObject) {
     var trackItem0 = spotifyObject.tracks.items[0];
     var trackItem0Album = trackItem0.album;
     var trackItem0AlbumImages0Url = trackItem0Album.images[0].url;
@@ -119,35 +102,42 @@ function onSpotifyGetSuccess(spotifyObject) {
     var trackItem0Artist0Name = trackItem0.artists[0].name;
     var trackItem0Duration = msToMinSecs(trackItem0.duration_ms);
     var trackItem0Name = trackItem0.name;
-    console.log(trackItem0);
+    $('#main').fadeOut(fadeOutDelayMs, function () {
+        $('#track-name').text(trackItem0Name);
+        $('#track-artist').text(trackItem0Artist0Name);
+        $('#track-album').text(trackItem0AlbumName);
+        $('#track-length').text(trackItem0Duration);
+        $('#album-art').attr("src", trackItem0AlbumImages0Url);
+
+        $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * 4, function () {
+            $('body').css("background-image", trackItem0AlbumImages0Url_construct);
+        });
+    });
+    /* Limpiar el handler ya que si no se hace, siempre usa el primero
+     * que se le enlaza, es decir: no cambia de acción */
+    $("#p-open").unbind("click");
+    $('#p-open').click(function () {
+        window.open(trackItem0.external_urls.spotify, "_blank")
+    });
+}
+
+function onSpotifyGetSuccess(spotifyObject) {
+    console.log(spotifyObject);
 
     /* Precargar imagen */
-    var preImg = new Image();
+    var albumArtPreloadObject = new Image();
     /* Llamar a la animación cuando la imagen esté precargada. Esto
      * evita los glitches en conexiones lentas o con mucha latencia
      * (glitches donde la imagen se ve a medias o simplemente no
      * está). Debería funcionar en todos los navegadores modernos.
      */
-    preImg.onload = function () {
-        $('#main').fadeOut(fadeOutDelayMs, function () {
-            $('#track-name').text(trackItem0Name);
-            $('#track-artist').text(trackItem0Artist0Name);
-            $('#track-album').text(trackItem0AlbumName);
-            $('#track-length').text(trackItem0Duration);
-            $('#album-art').attr("src", trackItem0AlbumImages0Url);
-
-            $('#main').css("background-image", trackItem0AlbumImages0Url_construct).fadeIn(fadeInDelayMs * 4, function () {
-                $('body').css("background-image", trackItem0AlbumImages0Url_construct);
-            });
-        });
-        /* Limpiar el handler ya que si no se hace, siempre usa el primero
-         * que se le enlaza, es decir: no cambia de acción */
-        $("#p-open").unbind("click");
-        $('#p-open').click(function () {
-            window.open(trackItem0.external_urls.spotify, "_blank")
-        });
+    albumArtPreloadObject.onload = function () {
+        onAlbumArtLoaded(spotifyObject);
     };
-    preImg.src = trackItem0AlbumImages0Url;
+    var trackItem0 = spotifyObject.tracks.items[0];
+    var trackItem0Album = trackItem0.album;
+    var trackItem0AlbumImages0Url = trackItem0Album.images[0].url;
+    albumArtPreloadObject.src = trackItem0AlbumImages0Url;
 }
 
 
@@ -161,6 +151,25 @@ function centerContainer() {
     var viewportHeight = $window.height();
     var scrollIt = elementTop - ((viewportHeight - elementHeight) / 2);
     $parent.scrollTop(scrollIt);
+}
+
+function querySpotify() {
+    var randySong = randySongs[currentRandyIndex];
+    currentRandyIndex = (currentRandyIndex + 1) % randySongs.length;
+    $.ajax({
+        type: "GET",
+        url: "https://api.spotify.com/v1/search",
+        headers: {
+            Authorization: 'Bearer ' + token
+        },
+        data: {
+            q: randySong,
+            type: 'track',
+            limit: '1',
+            offset: '0'
+        },
+        success: onSpotifyGetSuccess
+    });
 }
 
 /* ! TEST CODE AREA ! -------------------------------------------------------------------------------------------------------- */
