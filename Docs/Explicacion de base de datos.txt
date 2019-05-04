@@ -1,0 +1,2 @@
+La base de datos funciona como grafos de manera que el usuario siempre esta al centro y cada vez que salta una cancion, le da "no me gusta", etc., se va conectando de manera que aprende que le gusta y no le gusta al usuario
+A continuacion se muestra en la imagen la manera en que se conecta todo y como se ordena de manera que sigue la jerarquia de artista>album>cancion.
