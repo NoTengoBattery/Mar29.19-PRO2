@@ -200,7 +200,7 @@ function onAlbumArtLoaded(spotifyObject) {
 
     function allArtistInsertedCallback() {
         /* Simula los gustos del usuario */
-        var randyChoosed = Math.floor(Math.random() * 5);
+        var randyChoosed = Math.floor(Math.random() * 4);
 
         switch (randyChoosed) {
             case 0:
