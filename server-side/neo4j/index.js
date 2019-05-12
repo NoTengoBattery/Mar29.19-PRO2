@@ -22,8 +22,10 @@ router.get('/', function (req, res) {
 });
 
 router.use(function (req, res, next) {
-    console.log('Solicitud recibida, URL de petición: ' +
-        util.inspect(req.originalUrl) + ' query: ' + util.inspect(req.query));
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;;
+    console.log('Solicitud recibida (URL: ' +
+        util.inspect(req.originalUrl) + '), (query: ' + util.inspect(req.query) +
+        '), (source: ' + ip + ')');
     next();
 });
 

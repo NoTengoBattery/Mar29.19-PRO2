@@ -1,29 +1,30 @@
 {
-    "name": "neo4j",
-    "version": "1.0.0",
-    "description": "Una API RESTful que oscurece, abstrae y separa la base de datos; y restringe su acceso a la funcionalidad absolutamente mínima.",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "(https://github.com/NoTengoBattery/Mar29.19-PRO2.git)"
-    },
-    "keywords": [
+  "name": "neo4j",
+  "version": "1.0.0",
+  "description": "Una API RESTful que oscurece, abstrae y separa la base de datos; y restringe su acceso a la funcionalidad absolutamente mínima.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/NoTengoBattery/Mar29.19-PRO2.git)"
+  },
+  "keywords": [
     "neo4j",
     "restful",
     "nodejs"
   ],
-    "author": "Oever Gonzalez (notengobattery.com)",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/NoTengoBattery/Mar29.19-PRO2/issues"
-    },
-    "homepage": "https://brandy.notengobattery.com",
-    "dependencies": {
-        "express": "^4.16.4",
-        "neo4j-driver": "^1.7.4",
-        "util": "^0.12.0"
-    }
+  "author": "Oever Gonzalez (notengobattery.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NoTengoBattery/Mar29.19-PRO2/issues"
+  },
+  "homepage": "https://brandy.notengobattery.com",
+  "dependencies": {
+    "express": "^4.16.4",
+    "neo4j-driver": "^1.7.4",
+    "setprototypeof": "^1.1.1",
+    "util": "^0.12.0"
+  }
 }
