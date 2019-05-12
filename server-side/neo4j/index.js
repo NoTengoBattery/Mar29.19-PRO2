@@ -1,7 +1,7 @@
 /* Todos los paquetes */
 const express = require('express'); /* Pedir Express.js a Node.js */
 const util = require('util'); /* Utilidades para objetos de JavaScript */
-const neode = require('neode');
+const neode = require('neo4j-driver'); /* El driver de JavaScript */
 
 /* Variables y constantes del programa */
 var app = express(); /* Crear una aplicación de Express.js */

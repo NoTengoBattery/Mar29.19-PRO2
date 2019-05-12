@@ -22,7 +22,7 @@
     },
     "homepage": "https://brandy.notengobattery.com",
     "dependencies": {
-        "expressjs": "^1.0.1",
+        "express": "^4.16.4",
         "neo4j-driver": "^1.7.4",
         "util": "^0.12.0"
     }
