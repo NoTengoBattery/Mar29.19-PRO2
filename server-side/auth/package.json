@@ -1,0 +1,31 @@
+{
+  "name": "auth",
+  "version": "1.0.0",
+  "description": "Una API RESTful que oscurece, abstrae y separa la base de datos; y restringe su acceso a la funcionalidad absolutamente mínima.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/NoTengoBattery/Mar29.19-PRO2.git)"
+  },
+  "keywords": [
+    "neo4j",
+    "restful",
+    "nodejs"
+  ],
+  "author": "Oever Gonzalez (notengobattery.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NoTengoBattery/Mar29.19-PRO2/issues"
+  },
+  "homepage": "https://brandy.notengobattery.com",
+  "dependencies": {
+    "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.0",
+    "querystring": "^0.2.0",
+    "request": "^2.88.0"
+  }
+}
