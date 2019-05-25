@@ -4,6 +4,7 @@ const util = require('util'); /* Utilidades para objetos de JavaScript */
 const bodyParser = require('body-parser'); /* Esta sirve para obtener los datos de una solicitud POST */
 const dbi = require('./db'); /* Módulo para interactuar con la DB */
 const spotify = require('./spotify'); /* Módulo para interactuar con v2 y Spotify */
+const clases = require('./clases'); /* Módulo para interactuar con v2 y Spotify */
 
 /* Variables y constantes del programa */
 var app = express(); /* Crear una aplicación de Express.js */
@@ -68,43 +69,133 @@ router.post('/post/:token/', function (req, res, next) {
  * en este Node. De esta forma, la base de datos se abstrae totalmente para
  * cliente. */
 
+function VOID() {}
+
 function AddMe(req, res, next) {
-    function ReturnError(status, body) {
-        res.status(status).send(body);
-    };
-    AddMe.ReturnError = ReturnError;
     var token = req.params.token;
-    spotify.SpotifyGetRequest(null, '/me', token, CurrentUserGetCallback, ReturnError);
+
+    function ReturnError(ParentCallback, Status, Body) {
+        ParentCallback.current.res.status(Status).send(Body);
+    };
+    AddMeCallback = new clases.Callback(CurrentUserGetCallback, ReturnError, VOID, {
+        req: req,
+        res: res,
+        token: token
+    });
+    spotify.SpotifyGetRequest(AddMeCallback, null, '/me', token);
 }
 
-function CurrentUserMergeCallback() {
-    function Positive(TheUser) {
-        console.log(myname + ': OK: Database: TheUser ' + TheUser + ' agregado');
-    };
-
-    function Negative(TheUser) {
-        console.log(myname + ': NK: Database: TheUser ' + TheUser + ' no presente en la base de datos');
-        AddMe.ReturnError(500, {
-            message: 'El usuario no se pudo agregar a la base de datos.'
-        })
-    };
-
-    function After(TheUser) {
-        console.log(myname + ': OK: Database: TheUser ' + TheUser + ' agregado');
-    };
-    CurrentUserMergeCallback.Positive = Positive;
-    CurrentUserMergeCallback.Negative = Negative;
-    CurrentUserMergeCallback.After = After;
-}
-
-function CurrentUserGetCallback(SpotifyUser) {
-    CurrentUserMergeCallback();
+function CurrentUserGetCallback(ParentCallback, SpotifyUser) {
     console.log(myname + ': OK: Usuario ' + SpotifyUser.id + ' encontrado');
-    console.log(CurrentUserMergeCallback.Positive);
-    dbi.MergeSomeUser(SpotifyUser,
-        CurrentUserMergeCallback.Positive,
-        CurrentUserMergeCallback.Negative,
-        CurrentUserMergeCallback.After);
+    dbi.MergeSomeUser(CurrentUserMergeCallback(ParentCallback), SpotifyUser);
+}
+
+function CurrentUserMergeCallback(Parent) {
+    function positive(ParentCallback, TheUser) {
+        ParentCallback.current.user = TheUser;
+        console.log(myname + ': OK: Database: TheUser ' + TheUser + ' agregado y listo para agregar la biblioteca');
+        spotify.SpotifyGetRequest(CurrentUserLibraryGetCallback(ParentCallback), {
+            limit: 50
+        }, '/me/tracks', ParentCallback.current.token);
+    };
+
+    function negative(ParentCallback, TheUser) {
+        console.log(myname + ': NK: Database: TheUser ' + TheUser + ' no está presente en la base de datos');
+        ParentCallback.current.res.status(500).send({
+            message: 'El usuario no se pudo agregar a la base de datos.'
+        });
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function CurrentUserLibraryGetCallback(Parent) {
+    function positive(ParentCallback, Body) {
+        console.log(myname + ': OK: CurrentUserLibraryGetCallback: Respuesta recibida de Spotify.');
+        Body.items.forEach(function (Track) {
+            var TheTrackObject = Track.track;
+            var TheTrack = TheTrackObject.id;
+            dbi.MergeSomeTrack(TrackMergeCallback(ParentCallback), TheTrackObject);
+        });
+    };
+
+    function negative(ParentCallback, Status, Body) {
+        console.log(myname + ': NK: CurrentUserLibraryGetCallback: Spotify ha rechazado la petición.');
+        ParentCallback.current.res.status(Status).send(Body);
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function TrackMergeCallback(Parent) {
+    function positive(ParentCallback, TheTrack) {
+        console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' agregado');
+        spotify.SpotifyGetRequest(TrackAudioFeaturesCallback(ParentCallback),
+            null,
+            '/audio-features/' + TheTrack,
+            ParentCallback.current.token);
+    };
+
+    function negative(ParentCallback, TheTrack) {
+        console.log(myname + ': NK: Database: TheTrack ' + TheTrack + ' no está presente en la base de datos');
+        ParentCallback.current.res.status(500).send({
+            message: 'La pista no se pudo agregar a la base de datos.'
+        });
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function TrackAudioFeaturesCallback(Parent) {
+    function positive(ParentCallback, Body) {
+        console.log(myname + ': OK: TrackAudioFeaturesCallback: Respuesta recibida de Spotify.');
+        dbi.UpdateAudioFeatures(TrackSetAudioFeaturesCallback(ParentCallback), Body);
+    };
+
+    function negative(ParentCallback, Status, Body) {
+        console.log(myname + ': NK: TrackAudioFeaturesCallback: Spotify ha rechazado la petición.');
+        ParentCallback.current.res.status(Status).send(Body);
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function TrackSetAudioFeaturesCallback(Parent) {
+    function positive(ParentCallback, TheTrack) {
+        ParentCallback.current.track = TheTrack;
+        console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' actualizado');
+        dbi.RelateUserToTrackInLibrary(RelateUserToTrackInLibraryCallback(ParentCallback),
+            ParentCallback.current.user,
+            ParentCallback.current.track)
+    };
+
+    function negative(ParentCallback, TheTrack) {
+        console.log(myname + ': NK: Database: TheTrack ' + TheTrack + ' no está presente en la base de datos');
+        ParentCallback.current.res.status(500).send({
+            message: 'La pista no se pudo actualizar en la base de datos.'
+        });
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function RelateUserToTrackInLibraryCallback(Parent) {
+    function positive(ParentCallback, TheUser, TheTrack) {
+        ParentCallback.current.track = TheTrack;
+        console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' asociado con TheUser ' + TheUser + ': InLibrary');
+
+    };
+
+    function negative(ParentCallback, TheUser, TheTrack) {
+        console.log(myname + ': NK: Database: No se puede asociar TheTrack ' + TheTrack + ' con TheUser ' + TheUser);
+        ParentCallback.current.res.status(500).send({
+            message: 'La relación no pudo establecerse.',
+            track: TheTrack,
+            user: TheUser
+        });
+    };
+
+    return new clases.Callback(positive, negative, VOID, Parent.current);
 }
 
 router.post('/post/:token/addme', AddMe);

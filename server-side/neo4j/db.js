@@ -5,12 +5,12 @@ var dbDriver = neo4j.v1.driver("bolt://localhost", neo4j.v1.auth.basic("neo4j", 
 var dbSession = dbDriver.session(); /* Sesión de peticiones */
 
 module.exports = {
-    MergeSomeUser: function (SpotifyUser, positive, negative, after) {
+    MergeSomeUser: function (callback, SpotifyUser) {
         var TheUser = SpotifyUser.id;
         var UserPlusId = 'user' + TheUser;
         var UserIsPremium = ("premium".localeCompare(SpotifyUser.product) ? true : false);
         var UserAllowExplicit = (SpotifyUser.explicit_content.filter_enabled ? false : true);
-        var track = dbSession.run(
+        var User = dbSession.run(
             'MERGE (' + UserPlusId + ':User ' +
             '{userID: $id, ' +
             'userDisplayName: $name, ' +
@@ -19,25 +19,27 @@ module.exports = {
             'email: $email, ' +
             'country: $country}) ' +
             'RETURN ' + UserPlusId, {
-                name: SpotifyUser.display_name || TheUser,
                 id: TheUser,
+                name: SpotifyUser.display_name || TheUser,
                 premium: UserIsPremium,
                 explicit: UserAllowExplicit,
                 email: SpotifyUser.email,
                 country: SpotifyUser.country
             });
-        track.then(function (result) {
+        User.then(function (result) {
             if (result.records.length == 0) {
-                negative(TheUser);
+                callback.negative(callback, TheUser);
+                callback.after(callback, TheUser, false);
             } else {
-                positive(TheUser);
+                callback.positive(callback, TheUser);
+                callback.after(callback, TheUser, true);
             }
-            after(TheUser);
         });
     },
-    MergeSomeTrack: function (SpotifyTrack, positive, negative, after) {
-        var TrackPlusId = 'track' + SpotifyTrack.id;
-        var track = dbSession.run(
+    MergeSomeTrack: function (callback, SpotifyTrack) {
+        var TheTrack = SpotifyTrack.id;
+        var TrackPlusId = 'track' + TheTrack;
+        var Track = dbSession.run(
             'MERGE (' + TrackPlusId + ':Track ' +
             '{trackID: $id, ' +
             'durationMs: $duration, ' +
@@ -45,166 +47,84 @@ module.exports = {
             'trackName: $name, ' +
             'popularity: $popularity}) ' +
             'RETURN ' + TrackPlusId, {
-                id: SpotifyTrack.id,
+                id: TheTrack,
                 duration: SpotifyTrack.duration_ms,
                 explicit: SpotifyTrack.explicit,
                 name: SpotifyTrack.name,
                 popularity: SpotifyTrack.popularity
             });
-        track.then(function (result) {
+        Track.then(function (result) {
             if (result.records.length == 0) {
-                negative();
+                callback.negative(callback, TheTrack);
+                callback.after(callback, TheTrack, false);
             } else {
-                positive();
+                callback.positive(callback, TheTrack);
+                callback.after(callback, TheTrack, true);
             }
-            after();
         });
     },
-    MergeSomeAlbum: function (SpotifyAlbum, positive, negative, after) {
-        var AlbumPlusId = 'album' + SpotifyAlbum.id;
-        var album = dbSession.run(
-            'MERGE (' + AlbumPlusId + ':Album ' +
-            '{albumID: $id, ' +
-            'albumName: $name, ' +
-            'albumPopularity: $popularity, ' +
-            'totalTracks: $tracks}) ' +
-            'RETURN ' + AlbumPlusId, {
-                id: SpotifyAlbum.id,
-                name: SpotifyAlbum.name,
-                popularity: SpotifyAlbum.popularity,
-                tracks: SpotifyAlbum.total_tracks,
+    UpdateAudioFeatures: function (callback, TheAnalisys) {
+        var TheTrack = TheAnalisys.id;
+        var TrackPlusId = 'track' + TheTrack;
+        var Analisys = dbSession.run(
+            'MATCH (' + TrackPlusId + ':Track ' +
+            '{ trackID: $id })' +
+            'SET ' + TrackPlusId + ' += {' +
+            'duration_ms: $duration_ms,' +
+            'key: $key,' +
+            'mode: $mode,' +
+            'time_signature: $time_signature,' +
+            'acousticness: $acousticness,' +
+            'danceability: $danceability,' +
+            'energy: $energy,' +
+            'instrumentalness: $instrumentalness,' +
+            'liveness: $liveness,' +
+            'loudness: $loudness,' +
+            'speechiness: $speechiness,' +
+            'valence: $valence,' +
+            'tempo: $tempo' +
+            '} RETURN ' + TrackPlusId, {
+                id: TheTrack,
+                duration_ms: TheAnalisys.duration_ms,
+                key: TheAnalisys.key,
+                mode: TheAnalisys.mode,
+                time_signature: TheAnalisys.time_signature,
+                acousticness: TheAnalisys.acousticness,
+                danceability: TheAnalisys.danceability,
+                energy: TheAnalisys.energy,
+                instrumentalness: TheAnalisys.instrumentalness,
+                liveness: TheAnalisys.liveness,
+                loudness: TheAnalisys.loudness,
+                speechiness: TheAnalisys.speechiness,
+                valence: TheAnalisys.valence,
+                tempo: TheAnalisys.tempo
             });
-        album.then(function (result) {
+        Analisys.then(function (result) {
             if (result.records.length == 0) {
-                negative();
+                callback.negative(callback, TheTrack);
+                callback.after(callback, TheTrack, false);
             } else {
-                positive();
+                callback.positive(callback, TheTrack);
+                callback.after(callback, TheTrack, true);
             }
-            after();
         });
     },
-    IsAlbumOnDatabase: function (id, positive, negative, after) {
-        var album = dbSession.run(
-            'MATCH (n:Album) WHERE ' +
-            'n.albumID = $did ' +
-            'RETURN n', {
-                did: id
-            }
-        )
-        album.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    MergeSomeArtist: function (SpotifyArtist, positive, negative, after) {
-        var ArtistPlusId = 'artist' + SpotifyArtist.id;
-        var artist = dbSession.run(
-            'MERGE (' + ArtistPlusId + ':Artist ' +
-            '{artistID: $id, ' +
-            'artistName: $name, ' +
-            'artistPopularity: $popularity}) ' +
-            'RETURN ' + ArtistPlusId, {
-                id: SpotifyArtist.id,
-                name: SpotifyArtist.name,
-                popularity: SpotifyArtist.popularity
-            });
-        artist.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    IsArtistOnDatabase: function (id, positive, negative, after) {
-        var album = dbSession.run(
-            'MATCH (n:Artist) WHERE ' +
-            'n.artistID = $did ' +
-            'RETURN n', {
-                did: id
-            }
-        )
-        album.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    RelateTrackToAlbum: function (albumID, trackID, positive, negative, after) {
-        var relation = dbSession.run(
-            'MATCH (a:Album),(t:Track) WHERE a.albumID = $aid AND t.trackID = $tid ' +
-            'MERGE (t)-[r:PRESENT_IN]->(a) ' +
-            'RETURN type(r)', {
-                aid: albumID,
-                tid: trackID
-            });
-        relation.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    RelateTrackToArtist: function (atristID, trackID, positive, negative, after) {
-        var relation = dbSession.run(
-            'MATCH (a:Artist),(t:Track) WHERE a.artistID = $aid AND t.trackID = $tid ' +
-            'MERGE (t)-[r:INTERPRETED_BY]->(a) ' +
-            'RETURN type(r)', {
-                aid: atristID,
-                tid: trackID
-            });
-        relation.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    RelateArtistToAlbum: function (albumID, atristID, positive, negative, after) {
-        var relation = dbSession.run(
-            'MATCH (a:Album),(b:Artist) WHERE a.albumID = $aid AND b.artistID = $bid ' +
-            'MERGE (b)-[r:DEBOUT_IN]->(a) ' +
-            'RETURN type(r)', {
-                aid: albumID,
-                bid: atristID
-            });
-        relation.then(function (result) {
-            if (result.records.length == 0) {
-                negative();
-            } else {
-                positive();
-            }
-            after();
-        });
-    },
-    RelateUserToTrackInLibrary: function (userID, trackID, positive, negative, after) {
-        "use strict";
+    RelateUserToTrackInLibrary: function (callback, TheUser, TheTrack) {
         var relation = dbSession.run(
             'MATCH (u:User),(t:Track) WHERE u.userID = $uid AND t.trackID = $tid ' +
             'MERGE (t)-[r:IN_LIBRARY]->(u) ' +
             'RETURN type(r)', {
-                uid: userID,
-                tid: trackID
+                uid: TheUser,
+                tid: TheTrack
             });
         relation.then(function (result) {
             if (result.records.length == 0) {
-                negative();
+                callback.negative(callback, TheUser, TheTrack);
+                callback.after(callback, TheUser, TheTrack, false);
             } else {
-                positive();
+                callback.positive(callback, TheUser, TheTrack);
+                callback.after(callback, TheUser, TheTrack, true);
             }
-            after();
         });
     }
 };
