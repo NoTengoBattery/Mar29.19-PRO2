@@ -22,9 +22,11 @@
   },
   "homepage": "https://brandy.notengobattery.com",
   "dependencies": {
-    "express": "^4.16.4",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.0",
     "neo4j-driver": "^1.7.4",
-    "setprototypeof": "^1.1.1",
+    "querystring": "^0.2.0",
+    "request": "^2.88.0",
     "util": "^0.12.0"
   }
 }
