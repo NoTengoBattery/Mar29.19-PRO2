@@ -184,6 +184,7 @@ function AlbumGetCallback(Parent) {
         console.log(myname + ': OK: AlbumGetCallback: Respuesta recibida de Spotify.');
         var albumMergeCallback = AlbumMergeCallback(ParentCallback);
         albumMergeCallback.track = this.track;
+        albumMergeCallback.album = Body;
         dbi.MergeSomeAlbum(albumMergeCallback, Body);
     };
 
@@ -203,6 +204,9 @@ function AlbumMergeCallback(Parent) {
     function positive(ParentCallback, SpotifyAlbum) {
         var TheAlbum = SpotifyAlbum.id;
         console.log(myname + ': OK: Database: TheAlbum ' + TheAlbum + ' agregado');
+        dbi.RelateTrackToAlbum(RelateTrackToAlbumCallback(ParentCallback),
+            this.track.id,
+            this.album.id);
     };
 
     function negative(ParentCallback, SpotifyAlbum) {
@@ -210,13 +214,34 @@ function AlbumMergeCallback(Parent) {
         console.log(myname + ': NK: Database: TheAlbum ' + TheAlbum + ' no está presente en la base de datos');
         try {
             ParentCallback.current.res.status(500).send({
-                message: 'El álbum no se pudo actualizar en la base de datos.',
+                message: 'El álbum no se pudo agregar en la base de datos.',
                 album: TheAlbum
             });
         } catch (err) {
             return;
         }
 
+    };
+    return new clases.Callback(positive, negative, VOID, Parent.current);
+}
+
+function RelateTrackToAlbumCallback(Parent) {
+    function positive(ParentCallback, TheTrack, TheAlbum) {
+        console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' asociado con TheAlbum ' + TheAlbum + ': PresentIn');
+    };
+
+    function negative(ParentCallback, TheTrack, TheAlbum) {
+        console.log(myname + ': NK: Database: No se puede asociar TheTrack ' + TheTrack + ' con TheAlbum ' + TheAlbum);
+        try {
+            ParentCallback.current.res.status(500).send({
+                message: 'La relación no pudo establecerse.',
+                track: TheTrack,
+                relation: "PresentIn",
+                album: TheAlbum
+            });
+        } catch (err) {
+            return;
+        }
     };
 
     return new clases.Callback(positive, negative, VOID, Parent.current);
@@ -241,14 +266,16 @@ function TrackAudioFeaturesGetCallback(Parent) {
 }
 
 function TrackAudioFeaturesSetCallback(Parent) {
-    function positive(ParentCallback, TheTrack) {
+    function positive(ParentCallback, SpotifyTrack) {
+        var TheTrack = SpotifyTrack.id;
         console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' actualizado');
         dbi.RelateUserToTrackInLibrary(RelateUserToTrackInLibraryCallback(ParentCallback),
             ParentCallback.current.user.id,
-            TheTrack.id);
+            TheTrack);
     };
 
-    function negative(ParentCallback, TheTrack) {
+    function negative(ParentCallback, SpotifyTrack) {
+        var TheTrack = SpotifyTrack.id;
         console.log(myname + ': NK: Database: TheTrack ' + TheTrack + ' no está presente en la base de datos');
         try {
             ParentCallback.current.res.status(500).send({
@@ -267,7 +294,6 @@ function RelateUserToTrackInLibraryCallback(Parent) {
     function positive(ParentCallback, TheUser, TheTrack) {
         ParentCallback.current.track = TheTrack;
         console.log(myname + ': OK: Database: TheTrack ' + TheTrack + ' asociado con TheUser ' + TheUser + ': InLibrary');
-
     };
 
     function negative(ParentCallback, TheUser, TheTrack) {
@@ -276,6 +302,7 @@ function RelateUserToTrackInLibraryCallback(Parent) {
             ParentCallback.current.res.status(500).send({
                 message: 'La relación no pudo establecerse.',
                 track: TheTrack,
+                relation: "InLibrary",
                 user: TheUser
             });
         } catch (err) {

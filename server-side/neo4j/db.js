@@ -149,5 +149,23 @@ module.exports = {
                 callback.after(callback, SpotifyAlbum, true);
             }
         });
-    }
+    },
+    RelateTrackToAlbum: function (callback, TheTrack, TheAlbum) {
+        var Relation = dbSession.run(
+            'MATCH (a:Album),(t:Track) WHERE a.albumID = $aid AND t.trackID = $tid ' +
+            'MERGE (t)-[r:PRESENT_IN]->(a) ' +
+            'RETURN type(r)', {
+                aid: TheAlbum,
+                tid: TheTrack
+            });
+        Relation.then(function (result) {
+            if (result.records.length == 0) {
+                callback.negative(callback, TheTrack, TheAlbum);
+                callback.after(callback, TheTrack, TheAlbum, false);
+            } else {
+                callback.positive(callback, TheTrack, TheAlbum);
+                callback.after(callback, TheTrack, TheAlbum, true);
+            }
+        });
+    },
 };
