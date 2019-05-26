@@ -28,11 +28,11 @@ module.exports = {
             });
         User.then(function (result) {
             if (result.records.length == 0) {
-                callback.negative(callback, TheUser);
-                callback.after(callback, TheUser, false);
+                callback.negative(callback, SpotifyUser);
+                callback.after(callback, SpotifyUser, false);
             } else {
-                callback.positive(callback, TheUser);
-                callback.after(callback, TheUser, true);
+                callback.positive(callback, SpotifyUser);
+                callback.after(callback, SpotifyUser, true);
             }
         });
     },
@@ -55,11 +55,11 @@ module.exports = {
             });
         Track.then(function (result) {
             if (result.records.length == 0) {
-                callback.negative(callback, TheTrack);
-                callback.after(callback, TheTrack, false);
+                callback.negative(callback, SpotifyTrack);
+                callback.after(callback, SpotifyTrack, false);
             } else {
-                callback.positive(callback, TheTrack);
-                callback.after(callback, TheTrack, true);
+                callback.positive(callback, SpotifyTrack);
+                callback.after(callback, SpotifyTrack, true);
             }
         });
     },
@@ -101,29 +101,52 @@ module.exports = {
             });
         Analisys.then(function (result) {
             if (result.records.length == 0) {
-                callback.negative(callback, TheTrack);
-                callback.after(callback, TheTrack, false);
+                callback.negative(callback, TheAnalisys);
+                callback.after(callback, TheAnalisys, false);
             } else {
-                callback.positive(callback, TheTrack);
-                callback.after(callback, TheTrack, true);
+                callback.positive(callback, TheAnalisys);
+                callback.after(callback, TheAnalisys, true);
             }
         });
     },
     RelateUserToTrackInLibrary: function (callback, TheUser, TheTrack) {
-        var relation = dbSession.run(
+        var Relation = dbSession.run(
             'MATCH (u:User),(t:Track) WHERE u.userID = $uid AND t.trackID = $tid ' +
             'MERGE (t)-[r:IN_LIBRARY]->(u) ' +
             'RETURN type(r)', {
                 uid: TheUser,
                 tid: TheTrack
             });
-        relation.then(function (result) {
+        Relation.then(function (result) {
             if (result.records.length == 0) {
                 callback.negative(callback, TheUser, TheTrack);
                 callback.after(callback, TheUser, TheTrack, false);
             } else {
                 callback.positive(callback, TheUser, TheTrack);
                 callback.after(callback, TheUser, TheTrack, true);
+            }
+        });
+    },
+    MergeSomeAlbum: function (callback, SpotifyAlbum) {
+        var TheAlbum = SpotifyAlbum.id;
+        var AlbumPlusId = 'album' + TheAlbum;
+        var Album = dbSession.run(
+            'MERGE (' + AlbumPlusId + ':Album ' +
+            '{albumID: $id, ' +
+            'albumName: $name, ' +
+            'albumPopularity: $popularity}) ' +
+            'RETURN ' + AlbumPlusId, {
+                id: SpotifyAlbum.id,
+                name: SpotifyAlbum.name,
+                popularity: SpotifyAlbum.popularity,
+            });
+        Album.then(function (result) {
+            if (result.records.length == 0) {
+                callback.negative(callback, SpotifyAlbum);
+                callback.after(callback, SpotifyAlbum, false);
+            } else {
+                callback.positive(callback, SpotifyAlbum);
+                callback.after(callback, SpotifyAlbum, true);
             }
         });
     }
