@@ -1,7 +1,7 @@
 {
   "name": "auth",
   "version": "1.0.0",
-  "description": "Una API RESTful que oscurece, abstrae y separa la base de datos; y restringe su acceso a la funcionalidad absolutamente mínima.",
+  "description": "autorizacion para utilizar spotify con el programa",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -15,7 +15,7 @@
     "restful",
     "nodejs"
   ],
-  "author": "Oever Gonzalez (notengobattery.com)",
+  "author": "Juan Rodolfo Alonzo (notengobattery.com)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/NoTengoBattery/Mar29.19-PRO2/issues"
